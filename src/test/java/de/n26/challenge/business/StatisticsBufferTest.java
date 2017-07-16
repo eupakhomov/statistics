@@ -93,7 +93,7 @@ public class StatisticsBufferTest {
 
 
     @Test
-    public void addWithTimeDicrepancy() throws Exception {
+    public void addWithTimeDiscrepancy() throws Exception {
         StatisticsBuffer<Statistics> buffer = new StatisticsBuffer<>(60, new DefaultStatisticsCollector());
 
         buffer.add(1000L, timestampSecFor(10, 56),  timestampSecFor(10, 57));

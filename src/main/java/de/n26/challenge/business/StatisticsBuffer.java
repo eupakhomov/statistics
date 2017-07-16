@@ -15,8 +15,12 @@ import java.time.ZoneOffset;
  * computer with Intel Core i3-3110M @ 2.40GHz processor for that) so synchronization with the
  * {@link StatisticsBuffer#statisticData} monitor is used.
  *
- * For more performant solution something lock-free like LMAX Disruptor with background copy-on-write and
- * aggregation might be used.
+ * For more performant solution the options might be:
+ *  - in case of high contention - use locks instead of synchronized
+ *  - in case time discrepancy is mostly limited - to use lock per aggregation unit - second or several seconds
+ *  (implementation might be based on {@link java.util.concurrent.ConcurrentHashMap})
+ *  - some more advanced lock-free solution like LMAX Disruptor with multiple consumers pre-calculating
+ *  result per aggregation period
  *
  * @author <a href=mailto:eugene.pakhomov@ubitricity.com>Eugene Pakhomov</a>
  */
@@ -49,6 +53,10 @@ public class StatisticsBuffer<T> {
 
         // Skip transactions out of the period boundaries
         if(nowSec - transactionTimeSec >= statisticData.size() || transactionTimeSec > nowSec) {
+            // To distribute the load more evenly clear stale on each invocation
+            synchronized(statisticData) {
+                clearStale(nowSec);
+            }
             return;
         }
 
