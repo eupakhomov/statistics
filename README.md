@@ -11,6 +11,7 @@ returns the statistic based of the transactions of the last 60 seconds.
 `POST /transactions`
 
 Every Time a new transaction happened, this endpoint will be called.
+
 Body:
 ```
 {
